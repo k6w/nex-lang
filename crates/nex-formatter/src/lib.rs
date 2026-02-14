@@ -21,72 +21,93 @@ fn format_value(value: &Value, indent: usize) -> String {
 
 fn format_list(items: &[Value], indent: usize) -> String {
     if items.is_empty() {
-        return "[]".to_string();
+        return "()".to_string();
     }
 
-    let mut result = "[\n".to_string();
+    let mut result = "(\n".to_string();
     let item_indent = "  ".repeat(indent + 1);
 
-    for (i, item) in items.iter().enumerate() {
+    for item in items.iter() {
         result.push_str(&item_indent);
         result.push_str(&format_value(item, indent + 1));
-        if i < items.len() - 1 {
-            result.push(',');
-        }
         result.push('\n');
     }
 
     result.push_str(&"  ".repeat(indent));
-    result.push(']');
+    result.push(')');
     result
 }
 
 fn format_object(name: &Option<String>, fields: &HashMap<String, Value>, indent: usize) -> String {
-    let name_str = name.as_ref().map(|s| s.clone()).unwrap_or_else(|| "".to_string());
-    if fields.is_empty() {
-        return format!("{} {{}}", name_str);
-    }
+    match name {
+        Some(name_str) => {
+            if fields.is_empty() {
+                return format!("{}()", name_str);
+            }
 
-    let mut result = format!("{} {{\n", name_str);
-    let field_indent = "  ".repeat(indent + 1);
+            let mut result = format!("{}(\n", name_str);
+            let field_indent = "  ".repeat(indent + 1);
 
-    // Sort fields for consistent output
-    let mut sorted_fields: Vec<_> = fields.iter().collect();
-    sorted_fields.sort_by(|a, b| a.0.cmp(b.0));
+            // Sort fields for consistent output
+            let mut sorted_fields: Vec<_> = fields.iter().collect();
+            sorted_fields.sort_by(|a, b| a.0.cmp(b.0));
 
-    for (i, (key, value)) in sorted_fields.iter().enumerate() {
-        result.push_str(&field_indent);
-        result.push_str(key);
-        result.push_str(": ");
-        result.push_str(&format_value(value, indent + 1));
-        if i < sorted_fields.len() - 1 {
-            result.push(',');
+            for (_i, (key, value)) in sorted_fields.iter().enumerate() {
+                result.push_str(&field_indent);
+                result.push_str(key);
+                result.push(' ');
+                result.push_str(&format_value(value, indent + 1));
+                result.push('\n');
+            }
+
+            result.push_str(&"  ".repeat(indent));
+            result.push(')');
+            result
         }
-        result.push('\n');
-    }
+        None => {
+            // Anonymous object - format as just fields in parentheses
+            if fields.is_empty() {
+                return "()".to_string();
+            }
 
-    result.push_str(&"  ".repeat(indent));
-    result.push('}');
-    result
+            let mut result = "(\n".to_string();
+            let field_indent = "  ".repeat(indent + 1);
+
+            // Sort fields for consistent output
+            let mut sorted_fields: Vec<_> = fields.iter().collect();
+            sorted_fields.sort_by(|a, b| a.0.cmp(b.0));
+
+            for (_i, (key, value)) in sorted_fields.iter().enumerate() {
+                result.push_str(&field_indent);
+                result.push_str(key);
+                result.push(' ');
+                result.push_str(&format_value(value, indent + 1));
+                result.push('\n');
+            }
+
+            result.push_str(&"  ".repeat(indent));
+            result.push(')');
+            result
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nex_parser::parse;
 
     #[test]
     fn test_round_trip() {
         let input = r#"
-config {
-  name: "My App",
-  version: "1.0.0",
-  debug: true,
-  settings: {
-    timeout: 30,
-    features: [logging, caching]
-  }
-}
+config(
+  debug true
+  name "my app"
+  settings(
+    features(logging caching)
+    timeout 30
+  )
+  version "1.0.0"
+)
 "#;
 
         let parsed = nex_parser::parse(input).unwrap();

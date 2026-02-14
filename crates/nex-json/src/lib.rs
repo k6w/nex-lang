@@ -73,7 +73,7 @@ mod tests {
 
     #[test]
     fn test_nex_to_json_round_trip() {
-        let nex = r#"config { name: "test", count: 42 }"#;
+        let nex = r#"config(name "test" count 42)"#;
         let parsed = parse(nex).unwrap();
         let json = nex_to_json(&parsed);
         let back_to_nex = json_to_nex(&json);

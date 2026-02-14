@@ -1,5 +1,4 @@
 use nex_parser::ast::Value;
-use std::collections::HashMap;
 
 /// Schema validation result
 #[derive(Debug)]
@@ -78,8 +77,8 @@ mod tests {
 
     #[test]
     fn test_basic_validation() {
-        let data = parse(r#"config { name: "test", count: 42 }"#).unwrap();
-        let schema = parse(r#"config { name: string, count: int }"#).unwrap();
+        let data = parse(r#"config(name "test" count 42)"#).unwrap();
+        let schema = parse(r#"config(name string count int)"#).unwrap();
 
         match validate_against_schema(&data, &schema) {
             ValidationResult::Valid => {},

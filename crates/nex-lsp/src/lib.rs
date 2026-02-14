@@ -91,7 +91,7 @@ impl LanguageServer for Backend {
         }
     }
 
-    async fn hover(&self, params: HoverParams) -> Result<Option<Hover>> {
+    async fn hover(&self, _params: HoverParams) -> Result<Option<Hover>> {
         // Basic hover - could show type info
         Ok(None)
     }

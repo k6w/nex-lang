@@ -185,15 +185,15 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_list(&mut self) -> Result<Vec<Value>, ParseError> {
-        if self.current_char() != Some('[') {
-            return Err(ParseError::new(self.line, self.column, "Expected '['".to_string()));
+        if self.current_char() != Some('(') {
+            return Err(ParseError::new(self.line, self.column, "Expected '('".to_string()));
         }
         self.advance();
         self.skip_whitespace();
 
         let mut items = Vec::new();
 
-        if self.current_char() == Some(']') {
+        if self.current_char() == Some(')') {
             self.advance();
             return Ok(items);
         }
@@ -203,14 +203,9 @@ impl<'a> Parser<'a> {
             items.push(value);
             self.skip_whitespace();
 
-            if self.current_char() == Some(',') {
-                self.advance();
-                self.skip_whitespace();
-            } else if self.current_char() == Some(']') {
+            if self.current_char() == Some(')') {
                 self.advance();
                 break;
-            } else {
-                return Err(ParseError::new(self.line, self.column, "Expected ',' or ']' in list".to_string()));
             }
         }
 
@@ -218,23 +213,23 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_object(&mut self) -> Result<(Option<String>, HashMap<String, Value>), ParseError> {
-        let name = if self.current_char().map_or(false, |ch| ch.is_alphabetic() || ch == '_') {
+        let name = if self.current_char().is_some_and(|ch| ch.is_alphabetic() || ch == '_') {
             Some(self.parse_symbol()?)
         } else {
-            None
+            return Err(ParseError::new(self.line, self.column, "Expected object name".to_string()));
         };
 
         self.skip_whitespace();
 
-        if self.current_char() != Some('{') {
-            return Err(ParseError::new(self.line, self.column, "Expected '{' after object name".to_string()));
+        if self.current_char() != Some('(') {
+            return Err(ParseError::new(self.line, self.column, "Expected '(' after object name".to_string()));
         }
         self.advance();
         self.skip_whitespace();
 
         let mut fields = HashMap::new();
 
-        if self.current_char() == Some('}') {
+        if self.current_char() == Some(')') {
             self.advance();
             return Ok((name, fields));
         }
@@ -248,24 +243,13 @@ impl<'a> Parser<'a> {
 
             self.skip_whitespace();
 
-            if self.current_char() != Some(':') {
-                return Err(ParseError::new(self.line, self.column, "Expected ':' after field key".to_string()));
-            }
-            self.advance();
-            self.skip_whitespace();
-
             let value = self.parse_value()?;
             fields.insert(key, value);
             self.skip_whitespace();
 
-            if self.current_char() == Some(',') {
-                self.advance();
-                self.skip_whitespace();
-            } else if self.current_char() == Some('}') {
+            if self.current_char() == Some(')') {
                 self.advance();
                 break;
-            } else {
-                return Err(ParseError::new(self.line, self.column, "Expected ',' or '}' in object".to_string()));
             }
         }
 
@@ -276,58 +260,32 @@ impl<'a> Parser<'a> {
         self.skip_whitespace();
 
         match self.current_char() {
-            Some('n') => {
-                // Check for null
-                if self.input[self.position..].starts_with("null") {
-                    self.position += 4;
-                    self.column += 4;
-                    Ok(Value::Null)
-                } else {
-                    self.parse_symbol().map(Value::Symbol)
-                }
-            }
-            Some('t') => {
-                // Check for true
-                if self.input[self.position..].starts_with("true") {
-                    self.position += 4;
-                    self.column += 4;
-                    Ok(Value::Bool(true))
-                } else {
-                    self.parse_symbol().map(Value::Symbol)
-                }
-            }
-            Some('f') => {
-                // Check for false
-                if self.input[self.position..].starts_with("false") {
-                    self.position += 5;
-                    self.column += 5;
-                    Ok(Value::Bool(false))
-                } else {
-                    self.parse_symbol().map(Value::Symbol)
-                }
-            }
             Some('"') => self.parse_string().map(Value::String),
-            Some('[') => self.parse_list().map(Value::List),
-            Some('{') => {
-                let (name, fields) = self.parse_object()?;
-                Ok(Value::Object { name, fields })
-            }
+            Some('(') => self.parse_list().map(Value::List),
             Some(ch) if ch.is_ascii_digit() || ch == '-' => self.parse_number(),
             Some(ch) if ch.is_alphabetic() || ch == '_' => {
-                // Could be symbol or named object
+                // Could be symbol, keyword, or named object
                 let start_pos = self.position;
                 let symbol = self.parse_symbol()?;
-                self.skip_whitespace();
-
-                if self.current_char() == Some('{') {
-                    // It's a named object
-                    self.position = start_pos; // Reset position
-                    self.line = 1; // Reset line/column tracking for simplicity
-                    self.column = 1;
-                    let (name, fields) = self.parse_object()?;
-                    Ok(Value::Object { name, fields })
-                } else {
-                    Ok(Value::Symbol(symbol))
+                
+                // Check for keywords
+                match symbol.as_str() {
+                    "true" => Ok(Value::Bool(true)),
+                    "false" => Ok(Value::Bool(false)),
+                    "null" => Ok(Value::Null),
+                    _ => {
+                        self.skip_whitespace();
+                        if self.current_char() == Some('(') {
+                            // It's a named object
+                            self.position = start_pos; // Reset position
+                            self.line = 1; // Reset line/column tracking for simplicity
+                            self.column = 1;
+                            let (name, fields) = self.parse_object()?;
+                            Ok(Value::Object { name, fields })
+                        } else {
+                            Ok(Value::Symbol(symbol))
+                        }
+                    }
                 }
             }
             Some(ch) => Err(ParseError::new(self.line, self.column, format!("Unexpected character: {}", ch))),
@@ -389,14 +347,14 @@ mod tests {
 
     #[test]
     fn test_parse_list() {
-        assert_eq!(parse("[]").unwrap(), Value::List(vec![]));
-        assert_eq!(parse("[1, 2, 3]").unwrap(), Value::List(vec![Value::Int(1), Value::Int(2), Value::Int(3)]));
+        assert_eq!(parse("()").unwrap(), Value::List(vec![]));
+        assert_eq!(parse("(1 2 3)").unwrap(), Value::List(vec![Value::Int(1), Value::Int(2), Value::Int(3)]));
     }
 
     #[test]
     fn test_parse_object() {
         let mut fields = HashMap::new();
         fields.insert("key".to_string(), Value::String("value".to_string()));
-        assert_eq!(parse("obj { key: \"value\" }").unwrap(), Value::Object { name: Some("obj".to_string()), fields });
+        assert_eq!(parse("obj(key \"value\")").unwrap(), Value::Object { name: Some("obj".to_string()), fields });
     }
 }

@@ -1,79 +1,85 @@
-# NEX v1 Specification
+# nex v1 specification
 
-## Overview
+## overview
 
-NEX is a human-readable data serialization language designed for configuration files, data exchange, and structured data representation. It emphasizes simplicity, readability, and toolability.
+nex is a human-readable data serialization language designed for configuration files, data exchange, and structured data representation. it emphasizes simplicity, readability, and toolability.
 
-## Syntax
+## syntax
 
-NEX documents consist of values. The top-level value can be any valid NEX value.
+nex documents consist of values. the top-level value can be any valid nex value.
 
-### Values
+### values
 
-NEX supports the following value types:
+nex supports the following value types:
 
-1. **Null**: `null`
-2. **Boolean**: `true` or `false`
-3. **Integer**: Decimal numbers without decimal point, e.g., `42`, `-123`
-4. **Float**: Decimal numbers with decimal point, e.g., `3.14`, `-0.5`
-5. **String**: Double-quoted strings, e.g., `"hello world"`
-6. **Symbol**: Unquoted identifiers, e.g., `foo`, `bar_baz`
-7. **List**: Comma-separated values in square brackets, e.g., `[1, 2, "three"]`
-8. **Object**: Named or anonymous collections of key-value pairs in curly braces, e.g., `config { key: "value" }` or `{ key: "value" }`
+1. **null**: `null`
+2. **boolean**: `true` or `false`
+3. **integer**: decimal numbers without decimal point, e.g., `42`, `-123`
+4. **float**: decimal numbers with decimal point, e.g., `3.14`, `-0.5`
+5. **string**: double-quoted strings, e.g., `"hello world"`
+6. **symbol**: unquoted identifiers, e.g., `foo`, `bar_baz`
+7. **list**: space or newline separated values in parentheses, e.g., `(1 2 "three")`
+8. **object**: named collections of key-value pairs in parentheses, e.g., `config(name "my app" version "1.0.0")`
 
-### Objects
+### objects
 
-Objects have a name followed by curly braces containing fields:
-
-```
-object_name {
-  field1: value1,
-  field2: value2
-}
-```
-
-Field keys are symbols or strings. Values can be any NEX value.
-
-### Lists
-
-Lists are ordered collections:
+objects have a name followed by parentheses containing fields:
 
 ```
-[ item1, item2, item3 ]
+object_name(
+  field1 value1
+  field2 value2
+)
 ```
 
-Items can be any NEX value.
+field keys are symbols or strings. values can be any nex value.
 
-### Symbols
+### lists
 
-Symbols are identifiers that start with a letter or underscore, followed by letters, digits, or underscores. They do not need quotes.
-
-### Strings
-
-Strings are enclosed in double quotes. Standard escape sequences are supported: `\"`, `\\`, `\/`, `\b`, `\f`, `\n`, `\r`, `\t`, `\uXXXX`.
-
-### Numbers
-
-- Integers: `0`, `123`, `-456`
-- Floats: `0.0`, `3.14159`, `-2.5`, `1e10`, `2.5E-3`
-
-### Comments
-
-Single-line comments start with `#` or `//`:
+lists are ordered collections:
 
 ```
-# This is a comment
-config {
-  // Another comment
-  key: "value"
-}
+(item1 item2 item3)
 ```
 
-### Whitespace
+or named:
 
-Whitespace (spaces, tabs, newlines) is ignored except to separate tokens.
+```
+colors(red green blue)
+```
 
-## Grammar
+items can be any nex value.
+
+### symbols
+
+symbols are identifiers that start with a letter or underscore, followed by letters, digits, or underscores. they do not need quotes.
+
+### strings
+
+strings are enclosed in double quotes. standard escape sequences are supported: `\"`, `\\`, `\/`, `\b`, `\f`, `\n`, `\r`, `\t`, `\uXXXX`.
+
+### numbers
+
+- integers: `0`, `123`, `-456`
+- floats: `0.0`, `3.14159`, `-2.5`, `1e10`, `2.5e-3`
+
+### comments
+
+single-line comments start with `#` or `//`:
+
+```
+# this is a comment
+config(
+  // another comment
+  key "value"
+)
+```
+
+### whitespace
+
+whitespace (spaces, tabs, newlines) is ignored except to separate tokens.
+
+## grammar
 
 ```
 value ::= null | bool | number | string | symbol | list | object
@@ -86,64 +92,63 @@ number ::= integer | float
 
 integer ::= ["-"] digit+
 
-float ::= ["-"] digit+ "." digit+ [["e"|"E"] ["+"|"-"] digit+]
+float ::= ["-"] digit+ "." digit+ [["e"|"e"] ["+"|"-"] digit+]
 
 string ::= '"' (char | escape)* '"'
 
 symbol ::= letter (letter | digit | "_")*
 
-list ::= "[" [value ("," value)*] "]"
+list ::= "(" [value]+ ")"
 
-object ::= [symbol] "{" [field ("," field)*] "}"
+object ::= symbol "(" [field]+ ")"
 
-field ::= (symbol | string) ":" value
+field ::= (symbol | string) value
 ```
 
-## Examples
+## examples
 
-### Simple object
+### simple object
 ```
-config {
-  name: "My App",
-  version: "1.0.0",
-  debug: true
-}
-```
-
-### Nested structures
-```
-app {
-  database: db {
-    host: "localhost",
-    port: 5432,
-    credentials: {
-      user: "admin",
-      pass: "secret"
-    }
-  },
-  features: [logging, caching, auth]
-}
+config(
+  name "my app"
+  version "1.0.0"
+  debug true
+)
 ```
 
-### Mixed types
+### nested structures
 ```
-data {
-  null_value: null,
-  boolean: false,
-  integer: 42,
-  float: 3.14159,
-  string: "hello",
-  symbol: unquoted,
-  list: [1, "two", true],
-  nested: inner {
-    key: "value"
-  }
-}
+app(
+  database db(
+    host "localhost"
+    port 5432
+    credentials(
+      user "admin"
+      pass "secret"
+    )
+  )
+  features(logging caching auth)
+)
 ```
 
-## Implementation Notes
+### mixed types
+```
+data(
+  null_value null
+  boolean false
+  integer 42
+  float 3.14159
+  string "hello"
+  symbol unquoted
+  list(1 "two" true)
+  nested inner(
+    key "value"
+  )
+)
+```
 
-- Parsers should be case-sensitive
-- Trailing commas in lists and objects are allowed
-- Empty lists `[]` and empty objects `name {}` are valid
-- Symbols cannot be reserved words: `null`, `true`, `false`
+## implementation notes
+
+- parsers should be case-sensitive
+- empty lists `()` and empty objects `name()` are valid
+- symbols cannot be reserved words: `null`, `true`, `false`
