@@ -39,21 +39,11 @@ fn format_list(items: &[Value], indent: usize) -> String {
 }
 
 fn format_object(name: &Option<String>, fields: &HashMap<String, Value>, indent: usize) -> String {
-<<<<<<< HEAD
     match name {
         Some(name_str) => {
             if fields.is_empty() {
                 return format!("{}()", name_str);
             }
-=======
-    let name_str = name
-        .as_ref()
-        .map(|s| s.clone())
-        .unwrap_or_else(|| "".to_string());
-    if fields.is_empty() {
-        return format!("{} {{}}", name_str);
-    }
->>>>>>> 110b0390150cc088b293724811009421f3f234ab
 
             let mut result = format!("{}(\n", name_str);
             let field_indent = "  ".repeat(indent + 1);
