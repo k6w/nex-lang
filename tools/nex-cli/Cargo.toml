@@ -1,0 +1,22 @@
+[package]
+name = "nex-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "nex"
+path = "src/main.rs"
+
+[dependencies]
+nex-parser.workspace = true
+nex-formatter.workspace = true
+nex-json.workspace = true
+nex-lsp.workspace = true
+clap = { version = "4.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true

@@ -1,0 +1,21 @@
+[package]
+name = "nex-lsp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "nex-lsp"
+path = "src/main.rs"
+
+[dependencies]
+nex-parser = { path = "../nex-parser" }
+nex-formatter = { path = "../nex-formatter" }
+tower-lsp = "0.20"
+tokio = { version = "1.0", features = ["full"] }
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true

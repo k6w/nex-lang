@@ -1,0 +1,22 @@
+# rust
+target/
+Cargo.lock
+
+# vscode
+.vscode/settings.json
+*.vsix
+out/
+
+# node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# os
+.DS_Store
+Thumbs.db
+
+# temp
+*.tmp
+*.swp

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "NEX",
+  "scopeName": "source.nex",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#objects"
+    },
+    {
+      "include": "#lists"
+    },
+    {
+      "include": "#symbols"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.nex",
+          "match": "#.*$"
+        },
+        {
+          "name": "comment.line.double-slash.nex",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.nex",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "constant.language.nex",
+          "match": "\\b(null|true|false)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.nex",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.nex",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.float.nex",
+          "match": "\\b\\d+\\.\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.integer.nex",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    "objects": {
+      "patterns": [
+        {
+          "name": "meta.object.nex",
+          "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\{",
+          "beginCaptures": {
+            "1": { "name": "entity.name.type.nex" }
+          },
+          "end": "\\}",
+          "patterns": [
+            {
+              "include": "#object-content"
+            }
+          ]
+        },
+        {
+          "name": "meta.object.anonymous.nex",
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            {
+              "include": "#object-content"
+            }
+          ]
+        }
+      ]
+    },
+    "object-content": {
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "name": "meta.key-value.nex",
+          "match": "([a-zA-Z_][a-zA-Z0-9_]*|\"[^\"]*\")\\s*:",
+          "captures": {
+            "1": { "name": "variable.other.property.nex" }
+          }
+        },
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "lists": {
+      "name": "meta.sequence.nex",
+      "begin": "\\[",
+      "end": "\\]",
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "symbols": {
+      "name": "variable.other.nex",
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+    }
+  }
+}

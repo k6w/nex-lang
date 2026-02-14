@@ -1,0 +1,152 @@
+name: ci
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust: [stable]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: install rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: cache cargo registry
+        uses: actions/cache@v5
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cache cargo index
+        uses: actions/cache@v5
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cache cargo build
+        uses: actions/cache@v5
+        with:
+          path: |
+            crates/*/target
+            tools/*/target
+          key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.rust }}-cargo-build-
+
+      - name: build parser
+        run: |
+          cd crates/nex-parser
+          cargo build --verbose
+
+      - name: run parser tests
+        run: |
+          cd crates/nex-parser
+          cargo test --verbose
+
+      - name: build formatter
+        run: |
+          cd crates/nex-formatter
+          cargo build --verbose
+
+      - name: run formatter tests
+        run: |
+          cd crates/nex-formatter
+          cargo test --verbose
+
+      - name: build json
+        run: |
+          cd crates/nex-json
+          cargo build --verbose
+
+      - name: run json tests
+        run: |
+          cd crates/nex-json
+          cargo test --verbose
+
+      - name: build lsp
+        run: |
+          cd crates/nex-lsp
+          cargo build --verbose
+
+      - name: run lsp tests
+        run: |
+          cd crates/nex-lsp
+          cargo test --verbose
+
+      - name: build cli
+        run: |
+          cd tools/nex-cli
+          cargo build --verbose
+
+      - name: run cli tests
+        run: |
+          cd tools/nex-cli
+          cargo test --verbose
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: install rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: check formatting
+        id: fmtcheck
+        run: |
+          for dir in crates/* tools/*; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              cd $GITHUB_WORKSPACE/$dir
+              cargo fmt -- --check
+            fi
+          done
+
+      - name: auto-fix formatting and push
+        if: failure()
+        run: |
+          for dir in crates/* tools/*; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              cd $GITHUB_WORKSPACE/$dir
+              cargo fmt
+            fi
+          done
+          cd $GITHUB_WORKSPACE
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          echo "detected branch: $BRANCH_NAME"
+          git fetch origin $BRANCH_NAME
+          git checkout $BRANCH_NAME
+          git add .
+          git commit -m "chore: auto-format code via ci" || exit 0
+          git push origin $BRANCH_NAME
+
+      - name: run clippy
+        run: |
+          for dir in crates/* tools/*; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              cd $GITHUB_WORKSPACE/$dir
+              cargo clippy --all-targets -A dead-code || true
+            fi
+          done

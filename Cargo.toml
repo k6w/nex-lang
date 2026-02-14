@@ -1,0 +1,26 @@
+[workspace]
+members = [
+    "crates/nex-parser",
+    "crates/nex-formatter",
+    "crates/nex-schema",
+    "crates/nex-json",
+    "crates/nex-lsp",
+    "tools/nex-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["NEX Team"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/nex-lang/nex"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+nex-parser = { path = "crates/nex-parser" }
+nex-formatter = { path = "crates/nex-formatter" }
+nex-json = { path = "crates/nex-json" }
+nex-lsp = { path = "crates/nex-lsp" }
