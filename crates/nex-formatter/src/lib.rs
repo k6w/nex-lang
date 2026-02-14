@@ -42,7 +42,10 @@ fn format_list(items: &[Value], indent: usize) -> String {
 }
 
 fn format_object(name: &Option<String>, fields: &HashMap<String, Value>, indent: usize) -> String {
-    let name_str = name.as_ref().map(|s| s.clone()).unwrap_or_else(|| "".to_string());
+    let name_str = name
+        .as_ref()
+        .map(|s| s.clone())
+        .unwrap_or_else(|| "".to_string());
     if fields.is_empty() {
         return format!("{} {{}}", name_str);
     }
