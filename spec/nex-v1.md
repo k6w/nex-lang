@@ -2,28 +2,46 @@
 
 ## overview
 
-nex is a human-readable data serialization language designed for configuration files, data exchange, and structured data representation. it emphasizes simplicity, readability, and toolability.
+nex is a human-readable data serialization language for configuration files, data exchange,
+and structured data representation. It emphasises simplicity, readability, and toolability.
 
-## syntax
+## documents
 
-nex documents consist of values. the top-level value can be any valid nex value.
+A nex document is **exactly one value**, normally an object. Content after that value is an
+error.
 
-### values
+## values
 
-nex supports the following value types:
+| Kind | Syntax | Example |
+|---|---|---|
+| null | `null` | `null` |
+| boolean | `true` or `false` | `true` |
+| integer | optional `-`, then digits | `42`, `-123` |
+| float | digits with `.` and/or an exponent | `3.14`, `-0.5`, `2.5e-3` |
+| string | double-quoted | `"hello world"` |
+| symbol | bare identifier | `foo`, `bar_baz` |
+| list | `[` values `]` | `[1 2 "three"]` |
+| object | optional name, then `(` fields `)` | `config(name "app")`, `(name "app")` |
 
-1. **null**: `null`
-2. **boolean**: `true` or `false`
-3. **integer**: decimal numbers without decimal point, e.g., `42`, `-123`
-4. **float**: decimal numbers with decimal point, e.g., `3.14`, `-0.5`
-5. **string**: double-quoted strings, e.g., `"hello world"`
-6. **symbol**: unquoted identifiers, e.g., `foo`, `bar_baz`
-7. **list**: space or newline separated values in parentheses, e.g., `(1 2 "three")`
-8. **object**: named collections of key-value pairs in parentheses, e.g., `config(name "my app" version "1.0.0")`
+## the bracket rule
 
-### objects
+Square brackets and parentheses are never interchangeable:
 
-objects have a name followed by parentheses containing fields:
+- `[` … `]` is **always a list** — an ordered sequence of values.
+- `(` … `)` is **always an object** — a sequence of key/value pairs.
+
+A symbol immediately before `(` names the object's type:
+
+```
+tags[cli parser lsp]          # list of three symbols
+limits(timeout 30)            # anonymous object
+server tcp(host "0.0.0.0")    # object of type tcp
+```
+
+Inside an object, each field is a key followed by a value. Because the value of a field is
+just a value, all three forms above appear in field position without any extra syntax.
+
+## objects
 
 ```
 object_name(
@@ -32,40 +50,42 @@ object_name(
 )
 ```
 
-field keys are symbols or strings. values can be any nex value.
+Field keys are symbols or quoted strings. Values may be any nex value. An object's name is
+optional; `(field value)` is an anonymous object. Empty objects — `()` and `name()` — are
+valid.
 
-### lists
+Field order is not significant. Canonical output sorts fields by key, and a repeated key
+keeps its last value.
 
-lists are ordered collections:
-
-```
-(item1 item2 item3)
-```
-
-or named:
+## lists
 
 ```
-colors(red green blue)
+[item1 item2 item3]
 ```
 
-items can be any nex value.
+Items may be any nex value, and need not share a type. The empty list is `[]`.
 
-### symbols
+## symbols
 
-symbols are identifiers that start with a letter or underscore, followed by letters, digits, or underscores. they do not need quotes.
+Symbols start with a letter or underscore, followed by letters, digits, or underscores. They
+need no quotes. The words `null`, `true`, and `false` are reserved and are never symbols.
 
-### strings
+## strings
 
-strings are enclosed in double quotes. standard escape sequences are supported: `\"`, `\\`, `\/`, `\b`, `\f`, `\n`, `\r`, `\t`, `\uXXXX`.
+Strings are enclosed in double quotes and support the escape sequences `\"`, `\\`, `\/`,
+`\b`, `\f`, `\n`, `\r`, `\t`, and `\uXXXX`.
 
-### numbers
+## numbers
 
 - integers: `0`, `123`, `-456`
 - floats: `0.0`, `3.14159`, `-2.5`, `1e10`, `2.5e-3`
 
-### comments
+Canonical output always writes a float with a decimal point or exponent, so a float never
+reads back as an integer.
 
-single-line comments start with `#` or `//`:
+## comments
+
+Comments run from `#` or `//` to the end of the line.
 
 ```
 # this is a comment
@@ -75,39 +95,37 @@ config(
 )
 ```
 
-### whitespace
+## whitespace
 
-whitespace (spaces, tabs, newlines) is ignored except to separate tokens.
+Whitespace — spaces, tabs, and newlines — separates tokens and carries no other meaning.
+Layout is decided entirely by the formatter.
 
 ## grammar
 
 ```
-value ::= null | bool | number | string | symbol | list | object
+document ::= value
 
-null ::= "null"
+value    ::= null | bool | number | string | symbol | list | object
 
-bool ::= "true" | "false"
+null     ::= "null"
+bool     ::= "true" | "false"
+number   ::= integer | float
+integer  ::= ["-"] digit+
+float    ::= ["-"] digit+ ["." digit+] [("e" | "E") ["+" | "-"] digit+]
+string   ::= '"' (char | escape)* '"'
+symbol   ::= letter (letter | digit | "_")*
 
-number ::= integer | float
+list     ::= "[" value* "]"
+object   ::= [symbol] "(" field* ")"
+field    ::= (symbol | string) value
 
-integer ::= ["-"] digit+
-
-float ::= ["-"] digit+ "." digit+ [["e"|"e"] ["+"|"-"] digit+]
-
-string ::= '"' (char | escape)* '"'
-
-symbol ::= letter (letter | digit | "_")*
-
-list ::= "(" [value]+ ")"
-
-object ::= symbol "(" [field]+ ")"
-
-field ::= (symbol | string) value
+comment  ::= ("#" | "//") (any except newline)*
 ```
 
 ## examples
 
 ### simple object
+
 ```
 config(
   name "my app"
@@ -117,6 +135,7 @@ config(
 ```
 
 ### nested structures
+
 ```
 app(
   database db(
@@ -127,11 +146,15 @@ app(
       pass "secret"
     )
   )
-  features(logging caching auth)
+  features[logging caching auth]
 )
 ```
 
+`database` is a field whose value is an object of type `db`; `credentials` is a field whose
+value is an anonymous object; `features` is a field whose value is a list.
+
 ### mixed types
+
 ```
 data(
   null_value null
@@ -140,15 +163,35 @@ data(
   float 3.14159
   string "hello"
   symbol unquoted
-  list(1 "two" true)
+  list [1 "two" true]
   nested inner(
     key "value"
   )
 )
 ```
 
+## errors
+
+A parse error carries a 1-based line and column. Positions point at the token that opened the
+failing construct — an unterminated string reports its opening quote, an unclosed `(` reports
+that parenthesis — rather than at the point where scanning stopped.
+
 ## implementation notes
 
-- parsers should be case-sensitive
-- empty lists `()` and empty objects `name()` are valid
-- symbols cannot be reserved words: `null`, `true`, `false`
+- parsing is case-sensitive
+- empty lists `[]`, empty objects `()`, and empty named objects `name()` are valid
+- symbols cannot be the reserved words `null`, `true`, or `false`
+- documents are utf-8; both lf and crlf newlines are accepted
+
+## json mapping
+
+| nex | json |
+|---|---|
+| null, bool, int, float, string | the same |
+| symbol | string |
+| list | array |
+| anonymous object | object |
+| named object | object with the name under the reserved key `_type` |
+
+The mapping from nex to json is lossy in one direction: a symbol and a quoted string both
+become json strings, so converting back produces a string.

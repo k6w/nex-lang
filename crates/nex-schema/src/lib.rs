@@ -11,17 +11,32 @@ pub enum ValidationResult {
 /// For now, just checks basic structure
 pub fn validate_against_schema(value: &Value, schema: &Value) -> ValidationResult {
     match (value, schema) {
-        (Value::Object { name: val_name, fields: val_fields }, Value::Object { name: schema_name, fields: schema_fields }) => {
+        (
+            Value::Object {
+                name: val_name,
+                fields: val_fields,
+            },
+            Value::Object {
+                name: schema_name,
+                fields: schema_fields,
+            },
+        ) => {
             let mut errors = Vec::new();
 
             // Check name if schema specifies one
             if let Some(schema_name) = schema_name {
                 if let Some(val_name) = val_name {
                     if val_name != schema_name {
-                        errors.push(format!("Object name mismatch: expected {}, got {}", schema_name, val_name));
+                        errors.push(format!(
+                            "Object name mismatch: expected {}, got {}",
+                            schema_name, val_name
+                        ));
                     }
                 } else {
-                    errors.push(format!("Expected named object '{}', got anonymous", schema_name));
+                    errors.push(format!(
+                        "Expected named object '{}', got anonymous",
+                        schema_name
+                    ));
                 }
             }
 
@@ -59,7 +74,11 @@ fn check_type(value: &Value, expected: &Value) -> Result<(), String> {
         (Value::Object { .. }, Value::Symbol(s)) if s == "object" => Ok(()),
         (Value::Null, Value::Symbol(s)) if s == "null" => Ok(()),
         (Value::Symbol(_), Value::Symbol(s)) if s == "symbol" => Ok(()),
-        _ => Err(format!("Type mismatch: expected {}, got {}", type_name(expected), value.type_name())),
+        _ => Err(format!(
+            "Type mismatch: expected {}, got {}",
+            type_name(expected),
+            value.type_name()
+        )),
     }
 }
 
@@ -81,7 +100,7 @@ mod tests {
         let schema = parse(r#"config(name string count int)"#).unwrap();
 
         match validate_against_schema(&data, &schema) {
-            ValidationResult::Valid => {},
+            ValidationResult::Valid => {}
             ValidationResult::Invalid(errors) => panic!("Validation failed: {:?}", errors),
         }
     }

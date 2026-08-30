@@ -1,0 +1,25 @@
+# a nex document is exactly one root object
+app(
+  name "nex-lang"
+  version "1.0.0"
+  debug true
+  port 8080
+  ratio 0.75
+  maintainer null
+
+  # [a b c] is a list
+  tags[cli parser formatter lsp]
+
+  # key(...) nests an object
+  limits(
+    timeout 30
+    retries 3
+  )
+
+  # key Type(...) nests a type-tagged object
+  server tcp(
+    host "0.0.0.0"
+    port 8080
+    tls true
+  )
+)

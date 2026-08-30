@@ -58,6 +58,10 @@ pub struct ParseError {
 
 impl ParseError {
     pub fn new(line: usize, column: usize, message: String) -> Self {
-        Self { line, column, message }
+        Self {
+            line,
+            column,
+            message,
+        }
     }
 }

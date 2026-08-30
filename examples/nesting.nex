@@ -1,0 +1,5 @@
+app(
+  tags[cli parser lsp]
+  limits(timeout 30)
+  server tcp(host "0.0.0.0" port 8080)
+)

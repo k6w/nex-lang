@@ -38,7 +38,8 @@ impl LanguageServer for Backend {
     }
 
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
-        self.validate_document(params.text_document.uri, params.text_document.text).await;
+        self.validate_document(params.text_document.uri, params.text_document.text)
+            .await;
     }
 
     async fn did_change(&self, params: DidChangeTextDocumentParams) {
@@ -56,10 +57,14 @@ impl LanguageServer for Backend {
                     if formatted != *text {
                         let edit = TextEdit {
                             range: Range {
-                                start: Position { line: 0, character: 0 },
+                                start: Position {
+                                    line: 0,
+                                    character: 0,
+                                },
                                 end: Position {
                                     line: text.lines().count() as u32,
-                                    character: text.lines().last().map(|l| l.len()).unwrap_or(0) as u32,
+                                    character: text.lines().last().map(|l| l.len()).unwrap_or(0)
+                                        as u32,
                                 },
                             },
                             new_text: formatted,
@@ -76,7 +81,10 @@ impl LanguageServer for Backend {
         }
     }
 
-    async fn document_symbol(&self, params: DocumentSymbolParams) -> Result<Option<DocumentSymbolResponse>> {
+    async fn document_symbol(
+        &self,
+        params: DocumentSymbolParams,
+    ) -> Result<Option<DocumentSymbolResponse>> {
         let uri = params.text_document.uri;
         let docs = self.documents.lock().await;
         if let Some(text) = docs.get(&uri) {
@@ -107,9 +115,7 @@ impl Backend {
         match nex_parser::parse(&text) {
             Ok(_) => {
                 // Clear diagnostics
-                self.client
-                    .publish_diagnostics(uri, vec![], None)
-                    .await;
+                self.client.publish_diagnostics(uri, vec![], None).await;
             }
             Err(err) => {
                 let diagnostic = Diagnostic {
@@ -162,19 +168,32 @@ fn extract_symbols(value: &nex_parser::ast::Value, text: &str) -> Vec<DocumentSy
                         if let Some(field_pos) = text[start_pos..].find(field_name) {
                             let field_start = start_pos + field_pos;
                             let field_line = text[..field_start].lines().count() as u32 - 1;
-                            let field_char = text[..field_start].lines().last().unwrap_or("").len() as u32;
+                            let field_char =
+                                text[..field_start].lines().last().unwrap_or("").len() as u32;
 
                             children.push(DocumentSymbol {
                                 name: field_name.clone(),
                                 detail: None,
                                 kind: SymbolKind::PROPERTY,
                                 range: Range {
-                                    start: Position { line: field_line, character: field_char },
-                                    end: Position { line: field_line, character: field_char + field_name.len() as u32 },
+                                    start: Position {
+                                        line: field_line,
+                                        character: field_char,
+                                    },
+                                    end: Position {
+                                        line: field_line,
+                                        character: field_char + field_name.len() as u32,
+                                    },
                                 },
                                 selection_range: Range {
-                                    start: Position { line: field_line, character: field_char },
-                                    end: Position { line: field_line, character: field_char + field_name.len() as u32 },
+                                    start: Position {
+                                        line: field_line,
+                                        character: field_char,
+                                    },
+                                    end: Position {
+                                        line: field_line,
+                                        character: field_char + field_name.len() as u32,
+                                    },
                                 },
                                 children: None,
                                 tags: None,
@@ -188,12 +207,24 @@ fn extract_symbols(value: &nex_parser::ast::Value, text: &str) -> Vec<DocumentSy
                         detail: Some("object".to_string()),
                         kind: SymbolKind::OBJECT,
                         range: Range {
-                            start: Position { line: start_line, character: start_char },
-                            end: Position { line: end_line, character: end_char },
+                            start: Position {
+                                line: start_line,
+                                character: start_char,
+                            },
+                            end: Position {
+                                line: end_line,
+                                character: end_char,
+                            },
                         },
                         selection_range: Range {
-                            start: Position { line: start_line, character: start_char },
-                            end: Position { line: start_line, character: start_char + name.len() as u32 },
+                            start: Position {
+                                line: start_line,
+                                character: start_char,
+                            },
+                            end: Position {
+                                line: start_line,
+                                character: start_char + name.len() as u32,
+                            },
                         },
                         children: Some(children),
                         tags: None,
