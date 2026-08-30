@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="396" viewBox="0 0 880 396" role="img" aria-label="nex crate architecture">
+  <rect x="0.5" y="0.5" width="879" height="395" rx="12" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="330" y="28" width="220" height="46" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="440" y="47" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#1f2328">config.nex</tspan></text>
+  <text x="440" y="65" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#59636e">utf-8 source text</tspan></text>
+  <line x1="440" y1="74" x2="440" y2="98" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M440,104 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <rect x="300" y="104" width="280" height="58" rx="8" fill="#0969da" stroke="#0969da"/>
+  <text x="440" y="129" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#ffffff">nex-parser</tspan></text>
+  <text x="440" y="147" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#ffffff">recursive descent → Value AST</tspan></text>
+  <line x1="180" y1="162" x2="180" y2="196" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M180,202 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <line x1="180" y1="162" x2="440" y2="162" stroke="#818b98" stroke-width="1.5"/>
+  <rect x="60" y="202" width="240" height="58" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="180" y="227" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#1f2328">nex-formatter</tspan></text>
+  <text x="180" y="245" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#59636e">canonical text output</tspan></text>
+  <line x1="440" y1="162" x2="440" y2="196" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M440,202 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <rect x="320" y="202" width="240" height="58" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="440" y="227" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#1f2328">nex-json</tspan></text>
+  <text x="440" y="245" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#59636e">json ↔ nex bridge</tspan></text>
+  <line x1="700" y1="162" x2="700" y2="196" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M700,202 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <line x1="440" y1="162" x2="700" y2="162" stroke="#818b98" stroke-width="1.5"/>
+  <rect x="580" y="202" width="240" height="58" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="700" y="227" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#1f2328">nex-schema</tspan></text>
+  <text x="700" y="245" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#59636e">structural validation</tspan></text>
+  <line x1="440" y1="260" x2="440" y2="294" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M440,300 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <line x1="265" y1="300" x2="615" y2="300" stroke="#818b98" stroke-width="1.5"/>
+  <line x1="265" y1="300" x2="265" y2="316" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M265,322 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <rect x="105" y="322" width="320" height="52" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="265" y="344" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#1f2328">nex-cli</tspan></text>
+  <text x="265" y="362" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#59636e">check / format / to-json / from-json</tspan></text>
+  <line x1="615" y1="300" x2="615" y2="316" stroke="#818b98" stroke-width="1.5"/>
+  <path d="M615,322 l-4.5,-7 h9 Z" fill="#818b98"/>
+  <rect x="455" y="322" width="320" height="52" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="615" y="344" font-family="ui-monospace, SFMono-Regular, &#x27;SF Mono&#x27;, Menlo, Consolas, &#x27;Liberation Mono&#x27;, monospace" font-size="13.5" xml:space="preserve" font-weight="600" text-anchor="middle"><tspan fill="#1f2328">nex-lsp</tspan></text>
+  <text x="615" y="362" font-family="-apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;, Helvetica, Arial, sans-serif" font-size="11" xml:space="preserve" text-anchor="middle"><tspan fill="#59636e">diagnostics / symbols / formatting</tspan></text>
+</svg>
