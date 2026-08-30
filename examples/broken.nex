@@ -1,0 +1,4 @@
+app(
+  name "nex-lang
+  port 8080
+)

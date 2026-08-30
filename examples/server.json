@@ -1,0 +1,8 @@
+{
+  "_type": "server",
+  "host": "0.0.0.0",
+  "port": 8080,
+  "tls": true,
+  "workers": 4,
+  "tags": ["http", "prod"]
+}

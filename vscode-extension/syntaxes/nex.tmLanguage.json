@@ -3,27 +3,13 @@
   "name": "NEX",
   "scopeName": "source.nex",
   "patterns": [
-    {
-      "include": "#comments"
-    },
-    {
-      "include": "#keywords"
-    },
-    {
-      "include": "#strings"
-    },
-    {
-      "include": "#numbers"
-    },
-    {
-      "include": "#objects"
-    },
-    {
-      "include": "#lists"
-    },
-    {
-      "include": "#symbols"
-    }
+    { "include": "#comments" },
+    { "include": "#keywords" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#objects" },
+    { "include": "#lists" },
+    { "include": "#symbols" }
   ],
   "repository": {
     "comments": {
@@ -35,11 +21,6 @@
         {
           "name": "comment.line.double-slash.nex",
           "match": "//.*$"
-        },
-        {
-          "name": "comment.block.nex",
-          "begin": "/\\*",
-          "end": "\\*/"
         }
       ]
     },
@@ -58,7 +39,7 @@
       "patterns": [
         {
           "name": "constant.character.escape.nex",
-          "match": "\\\\."
+          "match": "\\\\(u[0-9a-fA-F]{4}|[\"\\\\/bfnrt])"
         }
       ]
     },
@@ -66,67 +47,68 @@
       "patterns": [
         {
           "name": "constant.numeric.float.nex",
-          "match": "\\b\\d+\\.\\d+\\b"
+          "match": "-?\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)\\b|-?\\b\\d+\\.\\d+\\b"
         },
         {
           "name": "constant.numeric.integer.nex",
-          "match": "\\b\\d+\\b"
+          "match": "-?\\b\\d+\\b"
         }
       ]
     },
     "objects": {
       "patterns": [
         {
-          "name": "meta.object.nex",
-          "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+          "name": "meta.object.named.nex",
+          "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(\\()",
           "beginCaptures": {
-            "1": { "name": "entity.name.type.nex" }
+            "1": { "name": "entity.name.type.nex" },
+            "2": { "name": "punctuation.section.object.begin.nex" }
           },
           "end": "\\)",
-          "patterns": [
-            {
-              "include": "#object-content"
-            }
-          ]
+          "endCaptures": {
+            "0": { "name": "punctuation.section.object.end.nex" }
+          },
+          "patterns": [{ "include": "#object-content" }]
         },
         {
           "name": "meta.object.anonymous.nex",
           "begin": "\\(",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.object.begin.nex" }
+          },
           "end": "\\)",
-          "patterns": [
-            {
-              "include": "#object-content"
-            }
-          ]
+          "endCaptures": {
+            "0": { "name": "punctuation.section.object.end.nex" }
+          },
+          "patterns": [{ "include": "#object-content" }]
         }
       ]
     },
     "object-content": {
       "patterns": [
-        {
-          "include": "#comments"
-        },
+        { "include": "#comments" },
         {
           "name": "meta.key-value.nex",
-          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*|\"[^\"]*\")\\s+",
+          "match": "(?:\\b([a-zA-Z_][a-zA-Z0-9_]*)|(\"[^\"]*\"))(?=\\s|\\(|\\[)",
           "captures": {
-            "1": { "name": "variable.other.property.nex" }
+            "1": { "name": "variable.other.property.nex" },
+            "2": { "name": "variable.other.property.nex" }
           }
         },
-        {
-          "include": "$self"
-        }
+        { "include": "$self" }
       ]
     },
     "lists": {
       "name": "meta.sequence.nex",
-      "begin": "\\(",
-      "end": "\\)",
-      "patterns": [
-        {
-          "include": "$self"
-        }
-      ]
+      "begin": "\\[",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.sequence.begin.nex" }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": { "name": "punctuation.section.sequence.end.nex" }
+      },
+      "patterns": [{ "include": "$self" }]
     },
     "symbols": {
       "name": "variable.other.nex",
